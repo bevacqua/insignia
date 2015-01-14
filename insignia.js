@@ -25,8 +25,6 @@ var inputClass = /\bnsg-input\b/g;
 var end = { start: 'end', end: 'end' };
 var cache = [];
 
-  // TODO cross browser selection ranges
-
 function find (el) {
   var entry;
   var i;
@@ -198,10 +196,10 @@ function insignia (el, o) {
     each(after, detect);
 
     function detect (value, tag) {
-      if (tags.indexOf(value) !== -1) {
-        tag.parentElement.removeChild(tag);
-      } else {
+      if (options.dupes === true || tags.indexOf(value) === -1) {
         tags.push(value);
+      } else {
+        tag.parentElement.removeChild(tag);
       }
     }
   }
@@ -278,7 +276,7 @@ function insignia (el, o) {
     return all;
 
     function add (value) {
-      if (value && all.indexOf(value) === -1) {
+      if (value && options.dupes === true || all.indexOf(value) === -1) {
         all.push(value);
       }
     }

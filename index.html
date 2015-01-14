@@ -44,6 +44,17 @@ insignia(input);
     </pre>
   </div>
   <div class='parent'>
+    <label for='dup'>Duplicates are okay sometimes: </label>
+    <div class='input'>
+      <input id='dup' value='dupe dupe dupe'>
+    </div>
+    <pre>
+      <code>
+insignia(input, { dupes: true });
+      </code>
+    </pre>
+  </div>
+  <div class='parent'>
     <label for='lng'>Really long lists behave reasonably well, too.</label>
     <div class='input'>
       <input id='lng' value='Really long lists behave reasonably well, too. Especially if you take into account this is JavaScript!'>

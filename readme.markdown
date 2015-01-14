@@ -58,6 +58,7 @@ A few options may be provided. They are detailed below.
 Option     | Description
 -----------|---------------------------------------------------------------------------------------
 `deletion` | When `true`, humans will be able to delete individual tags by clicking on an icon
+`dupes`    | When `true`, duplicates won't be automatically removed from the user input
 
 When you call `insignia(input, options)`, you'll get back a tiny API to interact with the instance. Calling `insignia` repeatedly on the same DOM element will have no effect, and it will return the same API object.
 

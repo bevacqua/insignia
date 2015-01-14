@@ -5,6 +5,7 @@ void function () {
   insignia(del, { deletion: true });
   insignia(def);
   insignia(lng);
+  insignia(dup, { dupes: true });
 
   var mssi = insignia(mss);
 
