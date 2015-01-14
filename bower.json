@@ -1,12 +1,11 @@
 {
   "name": "insignia",
-  "main": "insignia.js",
-  "version": "1.0.0",
+  "main": "dist/insignia.js",
+  "version": "1.0.1",
   "homepage": "https://github.com/bevacqua/insignia",
   "authors": [
     "Nicolas Bevacqua <nicolasbevacqua@gmail.com>"
   ],
-  "main": "dist/insignia.js",
   "description": "Customizable tag input. Progressive. No non-sense!",
   "license": "MIT"
 }
