@@ -39,7 +39,7 @@ bower install insignia --save
 
 # Usage
 
-Insignia demands one thing of you: **the input must be placed in a parent element and have no siblings.**
+Insignia demands one thing of you: **the input must have no siblings.**
 
 ```html
 <div>
@@ -49,7 +49,7 @@ Insignia demands one thing of you: **the input must be placed in a parent elemen
 
 If client-side JavaScript never executes, because its disabled or too slow [_(on intermittent mobile network connections, for example)_][3], you should treat user input as a space-separated list of tags. When JavaScript does execute, you should consider sending tags as a single string and splitting them on the server-side, for consistency.
 
-# `insignia(element, options={})`
+# `insignia(input, options={})`
 
 Insignia exposes a function to turn an input into a tag list input. Empty spans will be added on both sides of your input element.
 
@@ -59,7 +59,7 @@ Option     | Description
 -----------|---------------------------------------------------------------------------------------
 `deletion` | When `true`, humans will be able to delete individual tags by clicking on an icon
 
-When you call `insignia(element, options)`, you'll get back a tiny API to interact with the instance. Calling `insignia` repeatedly on the same DOM element will have no effect, and it will return the same API object.
+When you call `insignia(input, options)`, you'll get back a tiny API to interact with the instance. Calling `insignia` repeatedly on the same DOM element will have no effect, and it will return the same API object.
 
 ### `.tags()`
 
@@ -71,11 +71,11 @@ Returns the input value as a space-separated list of tags. This is the recommend
 
 ### `.destroy()`
 
-Removes all event listeners, CSS classes, and DOM elements created by Insignia. The input's `value` is set to the output of `.values()`. Once the instance is destroyed it becomes useless, and you'll have to call `insignia(element, options)` once again if you want to restore the behavior.
+Removes all event listeners, CSS classes, and DOM elements created by Insignia. The input's `value` is set to the output of `.values()`. Once the instance is destroyed it becomes useless, and you'll have to call `insignia(input, options)` once again if you want to restore the behavior.
 
 # Known Limitations
 
-On old versions of IE, Insignia won't automatically convert leftovers in the input box into tags during `blur` events. That's because the selection API demands that the element is focused (and thus blurred afterwards)
+On old versions of IE, Insignia won't automatically convert leftovers in the input box into tags during `blur` events. That's because the selection API demands that the input is focused (and thus blurred afterwards), which would trigger more `blur` events. There are workarounds, but simply not providing the feature was less involved.
 
 # License
 
