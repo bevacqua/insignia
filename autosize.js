@@ -20,7 +20,7 @@ var props = [
 ];
 var offset = 20;
 
-module.exports = function factory (el, fn) {
+module.exports = function factory (el) {
   var mirror = dom('span');
 
   document.body.appendChild(mirror);
@@ -34,12 +34,16 @@ module.exports = function factory (el, fn) {
   };
 
   function remap () {
-    var i;
     var c = computed();
+    var value;
+    var i;
     for (i = 0; i < props.length; i++) {
-      mirror.style[props[i]] = c[props[i]];
+      value = c[props[i]];
+      if (value !== void 0 && value !== null) { // otherwise IE blows up
+        mirror.style[props[i]] = value;
+      }
     }
-    mirror.setAttribute('disabled', 'disabled');
+    mirror.disabled = 'disabled';
     mirror.style.whiteSpace = 'pre';
     mirror.style.position = 'absolute';
     mirror.style.top = mirror.style.left = '-9999em';

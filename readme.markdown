@@ -15,6 +15,7 @@ The goal is to produce a framework-agnostic tag input editor that is easily inte
 - Small and focused
 - Natural keyboard navigation
 - Progressively enhanced
+- Extensive browser support
 
 # Install
 
@@ -65,6 +66,10 @@ Returns the input value as a space-separated list of tags. This is the recommend
 ### `.destroy()`
 
 Removes all event listeners, CSS classes, and DOM elements created by Insignia. The input's `value` is set to the output of `.values()`. Once the instance is destroyed it becomes useless, and you'll have to call `insignia(element, options)` once again if you want to restore the behavior.
+
+# Known Limitations
+
+On old versions of IE, Insignia won't automatically convert leftovers in the input box into tags during `blur` events. That's because the selection API demands that the element is focused (and thus blurred afterwards)
 
 # License
 

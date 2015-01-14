@@ -1,7 +1,11 @@
 'use strict';
 
+require('./polyfills/String.prototype.trim');
+require('./polyfills/Array.prototype.indexOf');
+
 var dom = require('./dom');
 var text = require('./text');
+var slice = require('./slice');
 var events = require('./events');
 var autosize = require('./autosize');
 var selection = require('./selection');
@@ -74,7 +78,7 @@ function insignia (el, o) {
     events[op](el, 'keydown', keydown);
     events[op](el, 'paste', paste);
     events[op](parent, 'click', click);
-    events[op](document.documentElement, 'focus', documentblur, true);
+    events[op](document.documentElement, 'blur', documentblur, true);
   }
 
   function destroy () {
@@ -95,11 +99,11 @@ function insignia (el, o) {
   function noop (value) {
     return function destroyed () {
       return value;
-    }
+    };
   }
 
   function documentblur (e) {
-    if (e.target !== el) {
+    if (e.target === el) {
       evaluate([' '], true);
       each(after, move);
     }
@@ -244,7 +248,7 @@ function insignia (el, o) {
   }
 
   function each (side, fn) {
-    var children = Array.prototype.slice.call(side.children);
+    var children = slice(side.children);
     var i;
     var tag;
     for (i = 0; i < children.length; i++) {

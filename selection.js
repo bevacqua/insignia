@@ -2,6 +2,8 @@
 
 var get = easyGet;
 var set = easySet;
+var inputTag = /input/i;
+var textareaTag = /textarea/i;
 
 if (document.selection && document.selection.createRange) {
   get = hardGet;
@@ -16,35 +18,51 @@ function easyGet (el) {
 }
 
 function hardGet (el) {
-  throw new Error('selection unsupported yet on old browsers');
-  // var range = document.selection.createRange();
-  // var bookmark = range.getBookmark();
-  // var originalContents = el.value;
-  // var marker = getUniqueMarker(originalContents);
-  // var parent = range.parentElement();
-  // if (parent === null || parent.type !== 'textarea') {
-  //     return { start: 0, end: 0 };
-  // }
-  // range.text = marker + range.text + marker;
+  var active = document.activeElement;
+  if (active !== el) {
+    el.focus();
+  }
 
-  // var contents = el.value;
+  var range = document.selection.createRange();
+  var bookmark = range.getBookmark();
+  var original = el.value;
+  var marker = getUniqueMarker(original);
+  var parent = range.parentElement();
+  if (parent === null || !inputs(parent)) {
+    return result(0, 0);
+  }
+  range.text = marker + range.text + marker;
 
-  // el.value = originalContents;
-  // range.moveToBookmark(bookmark);
-  // range.select();
+  var contents = el.value;
 
-  // return {
-  //   start: contents.indexOf(marker),
-  //   end: contents.lastIndexOf(marker)
-  // };
+  el.value = original;
+  range.moveToBookmark(bookmark);
+  range.select();
+
+  return result(contents.indexOf(marker), contents.lastIndexOf(marker) - marker.length);
+
+  function result (start, end) {
+    if (active !== el) { // don't disrupt pre-existing state
+      if (active) {
+        active.focus();
+      } else {
+        el.blur();
+      }
+    }
+    return { start: start, end: end };
+  }
 }
 
 function getUniqueMarker (contents) {
   var marker;
   do {
-    marker = '##MARKER_' + Math.random() * Date.now();
+    marker = '@@marker.' + Math.random() * new Date();
   } while (contents.indexOf(marker) !== -1);
   return marker;
+}
+
+function inputs (el) {
+  return ((inputTag.test(el.tagName) && el.type === 'text') || textareaTag.test(el.tagName));
 }
 
 function easySet (el, p) {
@@ -53,14 +71,17 @@ function easySet (el, p) {
 }
 
 function hardSet (el, p) {
-  throw new Error('selection unsupported yet on old browsers');
-  // var range;
+  var range = el.createTextRange();
 
-  // if (p.start === 'end' && p.end === 'end') {
-  //   range = el.createTextRange();
-  //   range.collapse(false);
-  //   range.select();
-  // }
+  if (p.start === 'end' && p.end === 'end') {
+    range.collapse(false);
+    range.select();
+  } else {
+    range.collapse(true);
+    range.moveEnd('character', p.end);
+    range.moveStart('character', p.start);
+    range.select();
+  }
 }
 
 function special (el, value) {
