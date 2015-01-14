@@ -4,6 +4,12 @@
 
 Browser support includes every sane browser and **IE7+**.
 
+# Demo!
+
+You can see a [live demo here][5].
+
+[![screenshot.png][4]][5]
+
 # Inspiration
 
 I needed a tag input that was progressively enhanced, fast, easy to use, and reliable. Tag inputs I stumbled upon were too bloated, too dependant on JavaScript, or provided an unfriendly human experience.
@@ -78,3 +84,5 @@ MIT
 [1]: http://stackoverflow.com/questions/ask
 [2]: https://github.com/bevacqua/rome
 [3]: http://ponyfoo.com/articles/stop-breaking-the-web
+[4]: http://i.imgur.com/mhy3Fv9.png
+[5]: http://bevacqua.github.io/insignia
