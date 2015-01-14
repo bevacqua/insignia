@@ -16,6 +16,10 @@
   cursor: pointer;
 }
 .nsg-input {
+  -webkit-transition: width 0.25s;
+  -moz-transition: width 0.25s;
+  -o-transition: width 0.25s;
+  -ms-transition: width 0.25s;
   transition: width 0.25s;
   padding: 3px;
   margin: 5px 0;
