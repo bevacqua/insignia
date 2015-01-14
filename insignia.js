@@ -117,13 +117,18 @@ function insignia (el, o) {
     var target = e.target;
     if (tagRemovalClass.test(target.className)) {
       focusTag(target.parentElement, { start: 'end', end: 'end', remove: true });
+      shift();
     } else if (tagClass.test(target.className)) {
       focusTag(target, end);
     } else if (target !== el) {
-      focusTag(after.lastChild, end);
-      evaluate([' '], true);
+      shift();
       el.focus();
     }
+  }
+
+  function shift () {
+    focusTag(after.lastChild, end);
+    evaluate([' '], true);
   }
 
   function keydown (e) {
