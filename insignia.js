@@ -10,7 +10,6 @@ var events = require('./events');
 var autosize = require('./autosize');
 var selection = require('./selection');
 var inputTag = /^input$/i;
-var spaces = /^\s*$/;
 var ELEMENT = 1;
 var BACKSPACE = 8;
 var SPACE = 32;
