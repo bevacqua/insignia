@@ -62,6 +62,7 @@ function insignia (el, o) {
   var api = {
     tags: tags,
     value: value,
+    convert: convert,
     destroy: destroy
   };
   var entry = { el: el, api: api };
@@ -102,12 +103,7 @@ function insignia (el, o) {
 
   function documentblur (e) {
     if (e.target === el) {
-      evaluate([' '], true);
-      each(after, move);
-    }
-
-    function move (value, tag) {
-      before.appendChild(tag);
+      convert(true);
     }
   }
 
@@ -129,13 +125,23 @@ function insignia (el, o) {
     evaluate([' '], true);
   }
 
+  function convert (all) {
+    evaluate([' '], all);
+    if (all) {
+      each(after, moveLeft);
+    }
+    return api;
+  }
+
+  function moveLeft (value, tag) {
+    before.appendChild(tag);
+  }
+
   function keydown (e) {
-    var partial;
     var sel = selection(el);
     var key = e.which || e.keyCode || e.charCode;
     if (key === SPACE) {
-      partial = el.value.slice(0, sel.start);
-      evaluate(spaces.test(partial) ? null : [' ']);
+      convert();
     } else if (key === HOME) {
       if (before.firstChild) {
         focusTag(before.firstChild, {});

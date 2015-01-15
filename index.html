@@ -87,6 +87,24 @@ toggle.addEventListener('click', function () {
       </code>
     </pre>
   </div>
+  <div class='parent'>
+    <label for='ant'>You can write a custom event handler to accept new tags on <kbd>Enter</kbd>: </label>
+    <div class='input'>
+      <input id='ant'>
+    </div>
+    <pre>
+      <code>
+var tagInput = insignia(input);
+
+input.addEventListener('keypress', function (e) {
+  if (e.keyCode === 13) {
+    tagInput.convert();
+    e.preventDefault(); // prevent form submission
+  }
+});
+      </code>
+    </pre>
+  </div>
 </div>
 <h3>Get it on GitHub! <a href='https://github.com/bevacqua/insignia'>bevacqua/insignia</a></h3>
 <script src='dist/insignia.js'></script>

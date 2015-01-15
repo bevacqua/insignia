@@ -47,7 +47,7 @@ Insignia demands one thing of you: **the input must have no siblings.**
 </div>
 ```
 
-If client-side JavaScript never executes, because its disabled or too slow [_(on intermittent mobile network connections, for example)_][3], you should treat user input as a space-separated list of tags. When JavaScript does execute, you should consider sending tags as a single string and splitting them on the server-side, for consistency.
+If client-side JavaScript never executes, because its disabled or too slow [_(on intermittent mobile network connections, for example)_][3], you should treat user input as a delimited list of tags. When JavaScript does execute, you should consider sending tags as a single string and splitting them on the server-side, for consistency.
 
 # `insignia(input, options={})`
 
@@ -55,10 +55,10 @@ Insignia exposes a function to turn an input into a tag list input. Empty spans 
 
 A few options may be provided. They are detailed below.
 
-Option     | Description
------------|---------------------------------------------------------------------------------------
-`deletion` | When `true`, humans will be able to delete individual tags by clicking on an icon
-`dupes`    | When `true`, duplicates won't be automatically removed from the user input
+Option      | Description
+------------|---------------------------------------------------------------------------------------
+`deletion`  | When `true`, humans will be able to delete individual tags by clicking on an icon
+`dupes`     | When `true`, duplicates won't be automatically removed from the user input
 
 When you call `insignia(input, options)`, you'll get back a tiny API to interact with the instance. Calling `insignia` repeatedly on the same DOM element will have no effect, and it will return the same API object.
 
@@ -68,7 +68,11 @@ Returns an array with the tags currently held by the input. Any "partial" tags _
 
 ### `.values()`
 
-Returns the input value as a space-separated list of tags. This is the recommended format in which you should send values to the server, because of progressive enhancement.
+Returns the input value as a delimited list of tags. This is the recommended format in which you should send values to the server, because of progressive enhancement.
+
+### `.convert(everything=false)`
+
+Parses text to the left of the caret into tags. If `everything` was true, it'll parse everything into tags instead. Useful for binding your own event handlers and deciding when to convert text into tags.
 
 ### `.destroy()`
 

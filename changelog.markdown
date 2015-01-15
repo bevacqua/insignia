@@ -1,3 +1,7 @@
+# 1.3.0 Conversion King
+
+- Introduced `.convert(everything=false)` API endpoint to parse tags on demand
+
 # 1.2.0 Dupe dupes
 
 - Introduced `dupes` option which allows duplicates when set to `true`
