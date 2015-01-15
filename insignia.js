@@ -281,7 +281,7 @@ function insignia (el, o) {
     return all;
 
     function add (value) {
-      if (value && options.dupes === true || all.indexOf(value) === -1) {
+      if (value && (options.dupes === true || all.indexOf(value) === -1)) {
         all.push(value);
       }
     }
