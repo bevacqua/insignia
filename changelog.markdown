@@ -1,3 +1,7 @@
+# 1.4.0 Demeter Law
+
+- Introduced custom `delimiter` support
+
 # 1.3.1 Empty Shoebox
 
 - Fixed a bug where `.tags()` would sometimes return empty elements
