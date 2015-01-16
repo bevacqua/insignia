@@ -12,7 +12,6 @@ var selection = require('./selection');
 var inputTag = /^input$/i;
 var ELEMENT = 1;
 var BACKSPACE = 8;
-var SPACE = 32;
 var END = 35;
 var HOME = 36;
 var LEFT = 37;
@@ -23,6 +22,7 @@ var editorClass = /\bnsg-editor\b/g;
 var inputClass = /\bnsg-input\b/g;
 var end = { start: 'end', end: 'end' };
 var cache = [];
+var defaultDelimiter = ' ';
 
 function find (el) {
   var entry;
@@ -43,6 +43,10 @@ function insignia (el, o) {
   }
 
   var options = o || {};
+  var delimiter = options.delimiter || defaultDelimiter;
+  if (delimiter.length !== 1) {
+    throw new Error('Insignia\'s delimiter can only be overridden with a single character string.');
+  }
   var any = hasSiblings(el);
   if (any || !inputTag.test(el.tagName)) {
     throw new Error('Insignia expected an input element without any siblings.');
@@ -66,7 +70,7 @@ function insignia (el, o) {
   };
   var entry = { el: el, api: api };
 
-  evaluate([' '], true);
+  evaluate([delimiter], true);
   cache.push(entry);
 
   return api;
@@ -74,6 +78,7 @@ function insignia (el, o) {
   function bind (remove) {
     var op = remove ? 'remove' : 'add';
     events[op](el, 'keydown', keydown);
+    events[op](el, 'keypress', keypress);
     events[op](el, 'paste', paste);
     events[op](parent, 'click', click);
     events[op](document.documentElement, 'blur', documentblur, true);
@@ -121,11 +126,11 @@ function insignia (el, o) {
 
   function shift () {
     focusTag(after.lastChild, end);
-    evaluate([' '], true);
+    evaluate([delimiter], true);
   }
 
   function convert (all) {
-    evaluate([' '], all);
+    evaluate([delimiter], all);
     if (all) {
       each(after, moveLeft);
     }
@@ -139,9 +144,7 @@ function insignia (el, o) {
   function keydown (e) {
     var sel = selection(el);
     var key = e.which || e.keyCode || e.charCode;
-    if (key === SPACE) {
-      convert();
-    } else if (key === HOME) {
+    if (key === HOME) {
       if (before.firstChild) {
         focusTag(before.firstChild, {});
       } else {
@@ -167,6 +170,15 @@ function insignia (el, o) {
     return false;
   }
 
+  function keypress (e) {
+    var key = e.which || e.keyCode || e.charCode;
+    if (String.fromCharCode(key) === delimiter) {
+      convert();
+      e.preventDefault();
+      return false;
+    }
+  }
+
   function paste () {
     setTimeout(function later () { evaluate(); }, 0);
   }
@@ -174,13 +186,13 @@ function insignia (el, o) {
   function evaluate (extras, entirely) {
     var p = selection(el);
     var len = entirely ? Infinity : p.start;
-    var tags = el.value.slice(0, len).concat(extras || []).split(' ');
+    var tags = el.value.slice(0, len).concat(extras || []).split(delimiter);
     if (tags.length < 1) {
       return;
     }
 
     var rest = tags.pop() + el.value.slice(len);
-    var removal = tags.join(' ').length;
+    var removal = tags.join(delimiter).length;
     var i;
 
     for (i = 0; i < tags.length; i++) {
@@ -226,7 +238,7 @@ function insignia (el, o) {
     if (!tag) {
       return;
     }
-    evaluate([' '], true);
+    evaluate([delimiter], true);
     var parent = tag.parentElement;
     if (parent === before) {
       while (parent.lastChild !== tag) {
@@ -267,7 +279,7 @@ function insignia (el, o) {
 
   function tags () {
     var all = [];
-    var values = el.value.split(' ');
+    var values = el.value.split(delimiter);
     var i;
 
     each(before, add);
@@ -288,7 +300,7 @@ function insignia (el, o) {
   }
 
   function value () {
-    return tags().join(' ');
+    return tags().join(delimiter);
   }
 }
 

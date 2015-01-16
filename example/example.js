@@ -2,6 +2,9 @@ void function () {
   'use strict';
 
   insignia(ty);
+  insignia(custom, {
+    delimiter: ','
+  });
   insignia(del, { deletion: true });
   insignia(def);
   insignia(lng);
