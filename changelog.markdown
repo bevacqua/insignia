@@ -1,3 +1,9 @@
+# 2.0.0 Slash and Dice
+
+- Removed `dupes` option
+- Introduced `parse` option to massage user-input tag into value of your choosing
+- Introduced `validate` option to assert whether a value is a valid tag
+
 # 1.4.0 Demeter Law
 
 - Introduced custom `delimiter` support

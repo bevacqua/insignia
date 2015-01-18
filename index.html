@@ -57,13 +57,50 @@ insignia(input);
     </pre>
   </div>
   <div class='parent'>
+    <label for='prs'>Sometimes we need to transform tags: </label>
+    <div class='input'>
+      <input id='prs' value='these were lower-case'>
+    </div>
+    <pre>
+      <code>
+insignia(input, {
+  parse: function (value) {
+    return value.toUpperCase();
+  }
+});
+      </code>
+    </pre>
+  </div>
+  <div class='parent'>
     <label for='dup'>Duplicates are okay sometimes: </label>
     <div class='input'>
       <input id='dup' value='dupe dupe dupe'>
     </div>
     <pre>
       <code>
-insignia(input, { dupes: true });
+insignia(input, {
+  validate: function (value, tags) {
+    return true;
+  }
+});
+      </code>
+    </pre>
+  </div>
+  <div class='parent'>
+    <label for='bth'>Sometimes we need to do both! </label>
+    <div class='input'>
+      <input id='bth' value='a a b b c c'>
+    </div>
+    <pre>
+      <code>
+insignia(input, {
+  parse: function (value) {
+    return value.toUpperCase();
+  },
+  validate: function (value, tags) {
+    return true;
+  }
+});
       </code>
     </pre>
   </div>

@@ -49,17 +49,43 @@ Insignia demands one thing of you: **the input must have no siblings.**
 
 If client-side JavaScript never executes, because its disabled or too slow [_(on intermittent mobile network connections, for example)_][3], you should treat user input as a delimited list of tags. When JavaScript does execute, you should consider sending tags as a single string and splitting them on the server-side, for consistency.
 
-# `insignia(input, options={})`
+### `insignia(input, options={})`
 
 Insignia exposes a function to turn an input into a tag list input. Empty spans will be added on both sides of your input element.
 
 A few options may be provided. They are detailed below.
 
-Option      | Description
-------------|---------------------------------------------------------------------------------------
-`deletion`  | When `true`, humans will be able to delete individual tags by clicking on an icon
-`dupes`     | When `true`, duplicates won't be automatically removed from the user input
-`delimiter` | The separator between tags. Defaults to `' '`. Must be a single character.
+###### `deletion`
+
+When `true`, humans will be able to delete individual tags by clicking on an icon.
+
+###### `delimiter`
+
+The separator between tags. Defaults to `' '`. Must be a single character.
+
+###### `parse(value)`
+
+A method that's called whenever user input is evaluated as a tag. Useful to transform user input. Defaults to the method below.
+
+```js
+function parse (value) {
+  return value.trim().toLowerCase();
+}
+```
+
+###### `validate(value, tags)`
+
+A method that validates whether the _(previously `parse`d)_ user input `value` constitutes a valid tag, taking into account the currently valid `tags`. Useful to filter out duplicates. Defaults to the method below.
+
+```js
+function validate (value, tags) {
+  return tags.indexOf(value) === -1;
+}
+```
+
+Note that `tags` is only a copy and modifying it won't affect the list of tags.
+
+# API
 
 When you call `insignia(input, options)`, you'll get back a tiny API to interact with the instance. Calling `insignia` repeatedly on the same DOM element will have no effect, and it will return the same API object.
 

@@ -45,12 +45,14 @@ function insignia (el, o) {
   var options = o || {};
   var delimiter = options.delimiter || defaultDelimiter;
   if (delimiter.length !== 1) {
-    throw new Error('Insignia\'s delimiter can only be overridden with a single character string.');
+    throw new Error('Insignia expected a single-character delimiter string');
   }
   var any = hasSiblings(el);
   if (any || !inputTag.test(el.tagName)) {
-    throw new Error('Insignia expected an input element without any siblings.');
+    throw new Error('Insignia expected an input element without any siblings');
   }
+  var parse = options.parse || defaultParse;
+  var validate = options.validate || defaultValidate;
 
   var before = dom('span', 'nsg-tags nsg-tags-before');
   var after = dom('span', 'nsg-tags nsg-tags-after');
@@ -212,11 +214,11 @@ function insignia (el, o) {
     each(before, detect);
     each(after, detect);
 
-    function detect (value, tag) {
-      if (options.dupes === true || tags.indexOf(value) === -1) {
+    function detect (value, tagElement) {
+      if (validate(value, slice(tags))) {
         tags.push(value);
       } else {
-        tag.parentElement.removeChild(tag);
+        tagElement.parentElement.removeChild(tagElement);
       }
     }
   }
@@ -227,7 +229,7 @@ function insignia (el, o) {
       return;
     }
     var el = dom('span', 'nsg-tag');
-    text(el, trimmed);
+    text(el, parse(trimmed));
     if (options.deletion) {
       el.appendChild(dom('span', 'nsg-tag-remove'));
     }
@@ -273,7 +275,7 @@ function insignia (el, o) {
     var tag;
     for (i = 0; i < children.length; i++) {
       tag = children[i];
-      fn(text(tag).trim(), tag, i);
+      fn(text(tag), tag, i);
     }
   }
 
@@ -293,14 +295,26 @@ function insignia (el, o) {
     return all;
 
     function add (value) {
-      if (value && (options.dupes === true || all.indexOf(value) === -1)) {
-        all.push(value);
+      if (!value) {
+        return;
+      }
+      var tag = parse(value);
+      if (validate(tag, slice(all))) {
+        all.push(tag);
       }
     }
   }
 
   function value () {
     return tags().join(delimiter);
+  }
+
+  function defaultParse (value) {
+    return value.trim().toLowerCase();
+  }
+
+  function defaultValidate (value, tags) {
+    return tags.indexOf(value) === -1;
   }
 }
 

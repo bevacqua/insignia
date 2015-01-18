@@ -8,7 +8,24 @@ void function () {
   insignia(del, { deletion: true });
   insignia(def);
   insignia(lng);
-  insignia(dup, { dupes: true });
+  insignia(prs, {
+    parse: function (value) {
+      return value.toUpperCase();
+    }
+  })
+  insignia(dup, {
+    validate: function () {
+      return true;
+    }
+  });
+  insignia(bth, {
+    parse: function (value) {
+      return value.toUpperCase();
+    },
+    validate: function () {
+      return true;
+    }
+  });
 
   var mssi = insignia(mss);
   var anti = insignia(ant);
