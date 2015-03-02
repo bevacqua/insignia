@@ -3,10 +3,10 @@
 require('./polyfills/String.prototype.trim');
 require('./polyfills/Array.prototype.indexOf');
 
+var crossvent = require('crossvent');
 var dom = require('./dom');
 var text = require('./text');
 var slice = require('./slice');
-var events = require('./events');
 var autosize = require('./autosize');
 var selection = require('./selection');
 var inputTag = /^input$/i;
@@ -79,11 +79,11 @@ function insignia (el, o) {
 
   function bind (remove) {
     var op = remove ? 'remove' : 'add';
-    events[op](el, 'keydown', keydown);
-    events[op](el, 'keypress', keypress);
-    events[op](el, 'paste', paste);
-    events[op](parent, 'click', click);
-    if (options.blurry) { events[op](document.documentElement, 'blur', documentblur, true); }
+    crossvent[op](el, 'keydown', keydown);
+    crossvent[op](el, 'keypress', keypress);
+    crossvent[op](el, 'paste', paste);
+    crossvent[op](parent, 'click', click);
+    if (options.blurry) { crossvent[op](document.documentElement, 'blur', documentblur, true); }
   }
 
   function destroy () {

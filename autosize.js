@@ -1,8 +1,8 @@
 'use strict';
 
+var crossvent = require('crossvent');
 var dom = require('./dom');
 var text = require('./text');
-var events = require('./events');
 var props = [
   'fontFamily',
   'fontSize',
@@ -64,11 +64,11 @@ module.exports = function factory (el) {
 
   function bind (remove) {
     var op = remove ? 'remove' : 'add';
-    events[op](el, 'keydown', refresh);
-    events[op](el, 'keyup', refresh);
-    events[op](el, 'input', refresh);
-    events[op](el, 'paste', refresh);
-    events[op](el, 'change', refresh);
+    crossvent[op](el, 'keydown', refresh);
+    crossvent[op](el, 'keyup', refresh);
+    crossvent[op](el, 'input', refresh);
+    crossvent[op](el, 'paste', refresh);
+    crossvent[op](el, 'change', refresh);
   }
 
   function destroy () {

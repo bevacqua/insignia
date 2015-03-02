@@ -1,3 +1,7 @@
+# 3.0.1 Cross Ventures
+
+- Replaced `./events` with `crossvent` for code reuse
+
 # 3.0.0 Puppy Eyes
 
 - Blur autoconversion of leftovers is now behind a flag. Set `blurry: true` for the `2.0.0` behavior
