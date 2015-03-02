@@ -93,7 +93,7 @@ When you call `insignia(input, options)`, you'll get back a tiny API to interact
 
 Returns an array with the tags currently held by the input. Any "partial" tags _(e.g, not extracted from the input)_ will be returned as well.
 
-### `.values()`
+### `.value()`
 
 Returns the input value as a delimited list of tags. This is the recommended format in which you should send values to the server, because of progressive enhancement.
 
