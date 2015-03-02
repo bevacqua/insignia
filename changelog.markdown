@@ -1,3 +1,7 @@
+# 3.0.0 Puppy Eyes
+
+- Blur autoconversion of leftovers is now behind a flag. Set `blurry: true` for the `2.0.0` behavior
+
 # 2.0.0 Slash and Dice
 
 - Removed `dupes` option
