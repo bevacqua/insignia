@@ -1,4 +1,4 @@
-# 3.0.1 Cross Ventures
+# 3.0.2 Cross Ventures
 
 - Replaced `./events` with `crossvent` for code reuse
 
