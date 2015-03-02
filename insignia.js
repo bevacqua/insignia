@@ -65,8 +65,8 @@ function insignia (el, o) {
 
   var auto = autosize(el);
   var api = {
-    tags: tags,
-    value: value,
+    tags: readTags,
+    value: readValue,
     convert: convert,
     destroy: destroy
   };
@@ -88,7 +88,7 @@ function insignia (el, o) {
 
   function destroy () {
     bind(true);
-    el.value = value();
+    el.value = readValue();
     el.className = el.className.replace(inputClass, '');
     parent.className = parent.className.replace(editorClass, '');
     before.parentElement.removeChild(before);
@@ -279,7 +279,7 @@ function insignia (el, o) {
     }
   }
 
-  function tags () {
+  function readTags () {
     var all = [];
     var values = el.value.split(delimiter);
     var i;
@@ -305,8 +305,8 @@ function insignia (el, o) {
     }
   }
 
-  function value () {
-    return tags().join(delimiter);
+  function readValue () {
+    return readTags().join(delimiter);
   }
 
   function defaultParse (value) {
