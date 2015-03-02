@@ -83,7 +83,7 @@ function insignia (el, o) {
     events[op](el, 'keypress', keypress);
     events[op](el, 'paste', paste);
     events[op](parent, 'click', click);
-    events[op](document.documentElement, 'blur', documentblur, true);
+    if (options.blurry) { events[op](document.documentElement, 'blur', documentblur, true); }
   }
 
   function destroy () {
