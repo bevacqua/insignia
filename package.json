@@ -1,6 +1,6 @@
 {
   "name": "insignia",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Customizable tag input. Progressive. No non-sense!",
   "main": "insignia.js",
   "scripts": {
