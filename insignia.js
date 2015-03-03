@@ -42,7 +42,7 @@ function insignia (el, o) {
     return cached;
   }
 
-  var _nonselect = false;
+  var _noselect = document.activeElement !== el;
   var options = o || {};
   var delimiter = options.delimiter || defaultDelimiter;
   if (delimiter.length !== 1) {
@@ -75,6 +75,7 @@ function insignia (el, o) {
 
   evaluate([delimiter], true);
   cache.push(entry);
+  _noselect = false;
 
   return api;
 
@@ -110,9 +111,9 @@ function insignia (el, o) {
 
   function documentfocus (e) {
     if (e.target !== el) {
-      _nonselect = true;
+      _noselect = true;
       convert(true);
-      _nonselect = false;
+      _noselect = false;
     }
   }
 
@@ -207,7 +208,7 @@ function insignia (el, o) {
     el.value = rest;
     p.start -= removal;
     p.end -= removal;
-    if (_nonselect !== true) { selection(el, p); }
+    if (_noselect !== true) { selection(el, p); }
     auto.refresh();
   }
 

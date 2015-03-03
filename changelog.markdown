@@ -1,3 +1,7 @@
+# 4.0.2 Battle Focus
+
+- Fixed a bug where focus would get lost while initializing an element with `insignia(el)`
+
 # 4.0.1 Bug Safari
 
 - Fixed a Safari bug where focusing would break ([#6](https://github.com/bevacqua/insignia/issues/6))
