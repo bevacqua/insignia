@@ -42,6 +42,7 @@ function insignia (el, o) {
     return cached;
   }
 
+  var _evaluation = false;
   var options = o || {};
   var delimiter = options.delimiter || defaultDelimiter;
   if (delimiter.length !== 1) {
@@ -83,7 +84,7 @@ function insignia (el, o) {
     crossvent[op](el, 'keypress', keypress);
     crossvent[op](el, 'paste', paste);
     crossvent[op](parent, 'click', click);
-    if (options.blurry) { crossvent[op](document.documentElement, 'blur', documentblur, true); }
+    crossvent[op](document.documentElement, 'focus', documentfocus, true);
   }
 
   function destroy () {
@@ -107,8 +108,8 @@ function insignia (el, o) {
     };
   }
 
-  function documentblur (e) {
-    if (e.target === el) {
+  function documentfocus (e) {
+    if (_evaluation === false && e.target !== el) {
       convert(true);
     }
   }
@@ -193,6 +194,8 @@ function insignia (el, o) {
       return;
     }
 
+    _evaluation = true;
+
     var rest = tags.pop() + el.value.slice(len);
     var removal = tags.join(delimiter).length;
     var i;
@@ -206,6 +209,7 @@ function insignia (el, o) {
     p.end -= removal;
     selection(el, p);
     auto.refresh();
+    _evaluation = false;
   }
 
   function cleanup () {

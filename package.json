@@ -32,6 +32,6 @@
     "watchify": "^2.2.1"
   },
   "dependencies": {
-    "crossvent": "^1.0.0"
+    "crossvent": "^1.1.0"
   }
 }

@@ -1,3 +1,7 @@
+# 4.0.0 Blurry Vision
+
+- Reintroduced tag conversion on `focus` events
+
 # 3.0.3 Cross Ventures
 
 - Replaced `./events` with `crossvent` for code reuse

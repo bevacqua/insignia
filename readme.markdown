@@ -63,14 +63,6 @@ When `true`, humans will be able to delete individual tags by clicking on an ico
 
 The separator between tags. Defaults to `' '`. Must be a single character.
 
-###### `blurry`
-
-When `true`, leftover tags on the input field will be converted into tag labels.
-
-###### Known Limitations
-
-On old versions of IE, Insignia won't automatically convert leftovers in the input box into tags during `blur` events. That's because the selection API demands that the input is focused (and thus blurred afterwards), which would trigger more `blur` events. There are workarounds, but simply not providing the feature was less involved.
-
 ###### `parse(value)`
 
 A method that's called whenever user input is evaluated as a tag. Useful to transform user input. Defaults to the method below.
