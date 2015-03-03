@@ -42,7 +42,7 @@ function insignia (el, o) {
     return cached;
   }
 
-  var _evaluation = false;
+  var _nonselect = false;
   var options = o || {};
   var delimiter = options.delimiter || defaultDelimiter;
   if (delimiter.length !== 1) {
@@ -109,8 +109,10 @@ function insignia (el, o) {
   }
 
   function documentfocus (e) {
-    if (_evaluation === false && e.target !== el) {
+    if (e.target !== el) {
+      _nonselect = true;
       convert(true);
+      _nonselect = false;
     }
   }
 
@@ -194,8 +196,6 @@ function insignia (el, o) {
       return;
     }
 
-    _evaluation = true;
-
     var rest = tags.pop() + el.value.slice(len);
     var removal = tags.join(delimiter).length;
     var i;
@@ -207,9 +207,8 @@ function insignia (el, o) {
     el.value = rest;
     p.start -= removal;
     p.end -= removal;
-    selection(el, p);
+    if (_nonselect !== true) { selection(el, p); }
     auto.refresh();
-    _evaluation = false;
   }
 
   function cleanup () {

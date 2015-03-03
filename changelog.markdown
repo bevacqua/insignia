@@ -1,3 +1,7 @@
+# 4.0.1 Bug Safari
+
+- Fixed a Safari bug where focusing would break ([#6](https://github.com/bevacqua/insignia/issues/6))
+
 # 4.0.0 Blurry Vision
 
 - Reintroduced tag conversion on `focus` events
