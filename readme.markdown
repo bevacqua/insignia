@@ -105,6 +105,14 @@ Parses text to the left of the caret into tags. If `everything` was true, it'll 
 
 Removes all event listeners, CSS classes, and DOM elements created by Insignia. The input's `value` is set to the output of `.values()`. Once the instance is destroyed it becomes useless, and you'll have to call `insignia(input, options)` once again if you want to restore the behavior.
 
+# Events
+
+Once you've instantiated a `insignia`, some propietary synthetic events will be emitted on the provided `input`.
+
+Name                 | Description
+---------------------|---------------------------------------------------------------
+`insignia-converted` | Fired after a tag has been converted
+
 # License
 
 MIT
