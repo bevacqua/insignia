@@ -140,6 +140,7 @@ function insignia (el, o) {
     if (all) {
       each(after, moveLeft);
     }
+    crossvent.fabricate(el, 'insignia-selected');
     return api;
   }
 
