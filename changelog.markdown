@@ -1,3 +1,7 @@
+# 4.1.0 Roman Emperor
+
+- Added a custom `insignia-converted` event that's fired whenever a tag is converted
+
 # 4.0.2 Battle Focus
 
 - Fixed a bug where focus would get lost while initializing an element with `insignia(el)`
