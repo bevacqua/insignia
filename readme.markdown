@@ -49,6 +49,10 @@ Insignia demands one thing of you: **the input must have no siblings.**
 
 If client-side JavaScript never executes, because its disabled or too slow [_(on intermittent mobile network connections, for example)_][3], you should treat user input as a delimited list of tags. When JavaScript does execute, you should consider sending tags as a single string and splitting them on the server-side, for consistency.
 
+### `insignia.find(input)`
+
+Retrieves a previously created instance of Insignia associated with the provided `input`. Returns `null` if none can be found.
+
 ### `insignia(input, options={})`
 
 Insignia exposes a function to turn an input into a tag list input. Empty spans will be added on both sides of your input element.

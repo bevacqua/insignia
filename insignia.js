@@ -323,4 +323,5 @@ function insignia (el, o) {
   }
 }
 
+insignia.find = find;
 module.exports = insignia;

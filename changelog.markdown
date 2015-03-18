@@ -1,3 +1,7 @@
+# 4.2.0 Wonderboy
+
+- Introduced `insignia.find` method to look for existing instances
+
 # 4.1.1 Roman Emperor
 
 - Added a custom `insignia-converted` event that's fired whenever a tag is converted
