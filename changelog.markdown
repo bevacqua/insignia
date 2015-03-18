@@ -1,3 +1,7 @@
+# 4.2.1 Cross Polinize
+
+- Updated `crossvent` to `1.3.1`
+
 # 4.2.0 Wonderboy
 
 - Introduced `insignia.find` method to look for existing instances
