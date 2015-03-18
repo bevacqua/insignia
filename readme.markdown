@@ -114,8 +114,9 @@ Removes all event listeners, CSS classes, and DOM elements created by Insignia. 
 Once you've instantiated a `insignia`, some propietary synthetic events will be emitted on the provided `input`.
 
 Name                 | Description
----------------------|---------------------------------------------------------------
+---------------------|---------------------------------------------------------------------------------
 `insignia-converted` | Fired after a tag has been converted
+`insignia-evaluated` | Fired after a tag has been converted or the input moved to edit another tag
 
 # License
 

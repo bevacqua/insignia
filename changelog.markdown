@@ -1,3 +1,7 @@
+# 4.2.2 Roman Emperor
+
+- Added a custom `insignia-evaluated` event that's fired whenever a tag is evaluated
+
 # 4.2.1 Cross Polinize
 
 - Updated `crossvent` to `1.3.1`

@@ -211,6 +211,7 @@ function insignia (el, o) {
     p.end -= removal;
     if (_noselect !== true) { selection(el, p); }
     auto.refresh();
+    crossvent.fabricate(el, 'insignia-evaluated');
   }
 
   function cleanup () {
