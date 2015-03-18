@@ -1,4 +1,4 @@
-# 4.1.0 Roman Emperor
+# 4.1.1 Roman Emperor
 
 - Added a custom `insignia-converted` event that's fired whenever a tag is converted
 
