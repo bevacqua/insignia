@@ -36,15 +36,15 @@ function find (el) {
   return null;
 }
 
-function insignia (el, o) {
+function insignia (el, options) {
   var cached = find(el);
   if (cached) {
     return cached;
   }
 
   var _noselect = document.activeElement !== el;
-  var options = o || {};
-  var delimiter = options.delimiter || defaultDelimiter;
+  var o = options || {};
+  var delimiter = o.delimiter || defaultDelimiter;
   if (delimiter.length !== 1) {
     throw new Error('Insignia expected a single-character delimiter string');
   }
@@ -52,8 +52,10 @@ function insignia (el, o) {
   if (any || !inputTag.test(el.tagName)) {
     throw new Error('Insignia expected an input element without any siblings');
   }
-  var parse = options.parse || defaultParse;
-  var validate = options.validate || defaultValidate;
+  var parse = o.parse || defaultParse;
+  var validate = o.validate || defaultValidate;
+  var render = o.render || defaultRenderer;
+  var readTag = o.readTag || defaultReader;
 
   var before = dom('span', 'nsg-tags nsg-tags-before');
   var after = dom('span', 'nsg-tags nsg-tags-after');
@@ -122,8 +124,16 @@ function insignia (el, o) {
     if (tagRemovalClass.test(target.className)) {
       focusTag(target.parentElement, { start: 'end', end: 'end', remove: true });
       shift();
-    } else if (tagClass.test(target.className)) {
-      focusTag(target, end);
+      return;
+    }
+    var top = target;
+    var tagged = tagClass.test(top.className);
+    while (tagged === false && top.parentElement) {
+      top = top.parentElement;
+      tagged = tagClass.test(top.className);
+    }
+    if (tagged) {
+      focusTag(top, end);
     } else if (target !== el) {
       shift();
       el.focus();
@@ -229,16 +239,24 @@ function insignia (el, o) {
     }
   }
 
+  function defaultRenderer (container, value) {
+    text(container, value);
+  }
+
+  function defaultReader (tag) {
+    return text(tag);
+  }
+
   function createTag (buffer, value) {
     var trimmed = value.trim();
     if (trimmed.length === 0) {
       return;
     }
     var el = dom('span', 'nsg-tag');
-    text(el, parse(trimmed));
-    if (options.deletion) {
+    if (o.deletion) {
       el.appendChild(dom('span', 'nsg-tag-remove'));
     }
+    render(el, parse(trimmed));
     buffer.appendChild(el);
   }
 
@@ -258,7 +276,7 @@ function insignia (el, o) {
       }
     }
     tag.parentElement.removeChild(tag);
-    el.value = p.remove ? '' : text(tag);
+    el.value = p.remove ? '' : readTag(tag);
     el.focus();
     selection(el, p);
     auto.refresh();
@@ -281,7 +299,7 @@ function insignia (el, o) {
     var tag;
     for (i = 0; i < children.length; i++) {
       tag = children[i];
-      fn(text(tag), tag, i);
+      fn(readTag(tag), tag, i);
     }
   }
 

@@ -1,3 +1,8 @@
+# 4.3.0 Render Asunder
+
+- Introduced custom `render` method
+- Introduced custom `readTag` method
+
 # 4.2.2 Roman Emperor
 
 - Added a custom `insignia-evaluated` event that's fired whenever a tag is evaluated

@@ -67,6 +67,26 @@ When `true`, humans will be able to delete individual tags by clicking on an ico
 
 The separator between tags. Defaults to `' '`. Must be a single character.
 
+###### `render(container, text)`
+
+A method that's called whenever a tag should be rendered. Defaults to the method below.
+
+```js
+function render (container, text) {
+  container.innerText = container.textContent = text;
+}
+```
+
+###### `readTag(el)`
+
+This is called whenever the tag has to be converted back to text. By default the text contents of the DOM element are returned, but you may have a more complicated DOM structure that demands you return the textual tag personally.
+
+```js
+function readTag (el) {
+  return el.innerText || el.textContent;
+}
+```
+
 ###### `parse(value)`
 
 A method that's called whenever user input is evaluated as a tag. Useful to transform user input. Defaults to the method below.
