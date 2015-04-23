@@ -22,6 +22,9 @@
     "url": "https://github.com/bevacqua/insignia/issues"
   },
   "homepage": "https://github.com/bevacqua/insignia",
+  "dependencies": {
+    "crossvent": "^1.3.1"
+  },
   "devDependencies": {
     "browserify": "^8.1.0",
     "clean-css": "^3.0.4",
@@ -30,8 +33,5 @@
     "stylus": "^0.49.3",
     "uglify-js": "^2.4.16",
     "watchify": "^2.2.1"
-  },
-  "dependencies": {
-    "crossvent": "^1.3.1"
   }
 }
