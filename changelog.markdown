@@ -1,3 +1,7 @@
+# 4.3.1 DeleteConf
+
+- Fixed an issue where `deletion` wouldn't append the element in charge of removing tags
+
 # 4.3.0 Render Asunder
 
 - Introduced custom `render` method

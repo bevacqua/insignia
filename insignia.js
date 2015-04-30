@@ -253,10 +253,10 @@ function insignia (el, options) {
       return;
     }
     var el = dom('span', 'nsg-tag');
+    render(el, parse(trimmed));
     if (o.deletion) {
       el.appendChild(dom('span', 'nsg-tag-remove'));
     }
-    render(el, parse(trimmed));
     buffer.appendChild(el);
   }
 
