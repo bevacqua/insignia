@@ -109,6 +109,10 @@ function validate (value, tags) {
 
 Note that `tags` is only a copy and modifying it won't affect the list of tags.
 
+###### `convertOnFocus`
+
+By default tags are converted if the `focus` event fires (besides other events)—this option allows you to disable this. Defaults to `true`, set to `false` to disable.
+
 # API
 
 When you call `insignia(input, options)`, you'll get back a tiny API to interact with the instance. Calling `insignia` repeatedly on the same DOM element will have no effect, and it will return the same API object.
