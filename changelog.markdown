@@ -1,3 +1,7 @@
+# 4.4.0 FocusFest
+
+- Added `convertOnFocus` option
+
 # 4.3.1 DeleteConf
 
 - Fixed an issue where `deletion` wouldn't append the element in charge of removing tags

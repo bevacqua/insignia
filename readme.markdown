@@ -111,7 +111,7 @@ Note that `tags` is only a copy and modifying it won't affect the list of tags.
 
 ###### `convertOnFocus`
 
-By default tags are converted if the `focus` event fires (besides other events)—this option allows you to disable this. Defaults to `true`, set to `false` to disable.
+By default tags are converted whenever the `focus` event fires on elements other than `input`. Defaults to `true`, set to `false` to disable.
 
 # API
 
