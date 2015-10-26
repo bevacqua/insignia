@@ -56,7 +56,7 @@ function insignia (el, options) {
   var validate = o.validate || defaultValidate;
   var render = o.render || defaultRenderer;
   var readTag = o.readTag || defaultReader;
-	var convertOnFocus = o.convertOnFocus !== false;
+  var convertOnFocus = o.convertOnFocus !== false;
 
   var before = dom('span', 'nsg-tags nsg-tags-before');
   var after = dom('span', 'nsg-tags nsg-tags-after');
@@ -88,7 +88,7 @@ function insignia (el, options) {
     crossvent[op](el, 'keypress', keypress);
     crossvent[op](el, 'paste', paste);
     crossvent[op](parent, 'click', click);
-		if (convertOnFocus) {
+    if (convertOnFocus) {
       crossvent[op](document.documentElement, 'focus', documentfocus, true);
     }
   }
