@@ -44,6 +44,7 @@ function insignia (el, options) {
 
   var _noselect = document.activeElement !== el;
   var o = options || {};
+  var limit = o.limit || -1;
   var delimiter = o.delimiter || defaultDelimiter;
   if (delimiter.length !== 1) {
     throw new Error('Insignia expected a single-character delimiter string');
@@ -56,7 +57,7 @@ function insignia (el, options) {
   var validate = o.validate || defaultValidate;
   var render = o.render || defaultRenderer;
   var readTag = o.readTag || defaultReader;
-	var convertOnFocus = o.convertOnFocus !== false;
+  var convertOnFocus = o.convertOnFocus !== false;
 
   var before = dom('span', 'nsg-tags nsg-tags-before');
   var after = dom('span', 'nsg-tags nsg-tags-after');
@@ -88,7 +89,7 @@ function insignia (el, options) {
     crossvent[op](el, 'keypress', keypress);
     crossvent[op](el, 'paste', paste);
     crossvent[op](parent, 'click', click);
-		if (convertOnFocus) {
+    if (convertOnFocus) {
       crossvent[op](document.documentElement, 'focus', documentfocus, true);
     }
   }
@@ -192,7 +193,17 @@ function insignia (el, options) {
 
   function keypress (e) {
     var key = e.which || e.keyCode || e.charCode;
-    if (String.fromCharCode(key) === delimiter) {
+    var keyChar = String.fromCharCode(key);
+    var sel = selection(el);
+
+    var nextVal = [el.value.slice(0, sel.start), keyChar, el.value.slice(sel.start)].join('');
+
+    if (limit !== -1 && readTags(nextVal).length > limit) {
+      e.preventDefault();
+      return false;
+    }
+
+    if (keyChar === delimiter) {
       convert();
       e.preventDefault();
       return false;
@@ -306,9 +317,10 @@ function insignia (el, options) {
     }
   }
 
-  function readTags () {
+  function readTags (text) {
+    text = text || el.value;
     var all = [];
-    var values = el.value.split(delimiter);
+    var values = text.split(delimiter);
     var i;
 
     each(before, add);

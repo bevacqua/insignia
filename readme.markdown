@@ -109,6 +109,10 @@ function validate (value, tags) {
 
 Note that `tags` is only a copy and modifying it won't affect the list of tags.
 
+###### `limit`
+
+Specify the maximum number of tags that can be inserted.
+
 ###### `convertOnFocus`
 
 By default tags are converted whenever the `focus` event fires on elements other than `input`. Defaults to `true`, set to `false` to disable.

@@ -2,6 +2,9 @@ void function () {
   'use strict';
 
   insignia(ty);
+  insignia(limit, {
+    limit: 2
+  });
   insignia(custom, {
     delimiter: ','
   });
