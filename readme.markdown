@@ -49,98 +49,124 @@ Insignia demands one thing of you: **the input must have no siblings.**
 
 If client-side JavaScript never executes, because its disabled or too slow [_(on intermittent mobile network connections, for example)_][3], you should treat user input as a delimited list of tags. When JavaScript does execute, you should consider sending tags as a single string and splitting them on the server-side, for consistency.
 
-### `insignia.find(input)`
+# `insignia.find(input)`
 
 Retrieves a previously created instance of Insignia associated with the provided `input`. Returns `null` if none can be found.
 
-### `insignia(input, options={})`
+# `insignia(input, options={})`
 
 Insignia exposes a function to turn an input into a tag list input. Empty spans will be added on both sides of your input element.
 
 A few options may be provided. They are detailed below.
 
-###### `deletion`
+### `free`
+
+Defaults to `true`. When this flag is turned off, tags can't be edited by hand but they can still be deleted entirely using backspace. Tags would have to be added programmatically.
+
+## `deletion`
 
 When `true`, humans will be able to delete individual tags by clicking on an icon.
 
-###### `delimiter`
+## `delimiter`
 
 The separator between tags. Defaults to `' '`. Must be a single character.
 
-###### `render(container, text)`
+## `preventInvalid`
 
-A method that's called whenever a tag should be rendered. Defaults to the method below.
+This option will prevent tags identified as invalid from being added. By default this is turned off and they just get a `nsg-invalid` CSS class.
 
-```js
-function render (container, text) {
-  container.innerText = container.textContent = text;
-}
-```
+## `validate(value)`
 
-###### `readTag(el)`
-
-This is called whenever the tag has to be converted back to text. By default the text contents of the DOM element are returned, but you may have a more complicated DOM structure that demands you return the textual tag personally.
+A method that validates whether the user input `value` constitutes a valid tag. Useful to filter out duplicates. Defaults to the method below, that does exactly that. Note that in the code below, `toy` is the API returned by calling `insignia(el)`.
 
 ```js
-function readTag (el) {
-  return el.innerText || el.textContent;
-}
-```
-
-###### `parse(value)`
-
-A method that's called whenever user input is evaluated as a tag. Useful to transform user input. Defaults to the method below.
-
-```js
-function parse (value) {
-  return value.trim().toLowerCase();
-}
-```
-
-###### `validate(value, tags)`
-
-A method that validates whether the _(previously `parse`d)_ user input `value` constitutes a valid tag, taking into account the currently valid `tags`. Useful to filter out duplicates. Defaults to the method below.
-
-```js
-function validate (value, tags) {
-  return tags.indexOf(value) === -1;
+function validate (value) {
+  return toy.findItem(value) === null;
 }
 ```
 
 Note that `tags` is only a copy and modifying it won't affect the list of tags.
 
-###### `convertOnFocus`
+## `render(container, item)`
 
-By default tags are converted whenever the `focus` event fires on elements other than `input`. Defaults to `true`, set to `false` to disable.
+A method that's called whenever a tag should be rendered. Defaults to setting `getText(item)` as the container's text.
 
-# API
+## `parseText`
+
+When you have complex data items from autocomplete, you need to set `parseText` to read the value that should be used as a display value.
+
+## `parseValue`
+
+When you have complex data items from autocomplete, you need to set `parseText` to read the value that should be used as each tag's value.
+
+## `convertOnBlur`
+
+By default, tags are converted whenever the `blur` event fires on elements other than `input`. Set to `false` to disable.
+
+# Instance API
 
 When you call `insignia(input, options)`, you'll get back a tiny API to interact with the instance. Calling `insignia` repeatedly on the same DOM element will have no effect, and it will return the same API object.
 
-### `.tags()`
+## `.addItem(data)`
 
-Returns an array with the tags currently held by the input. Any "partial" tags _(e.g, not extracted from the input)_ will be returned as well.
+Adds an item to the input. The `data` parameter could be a string or a complex object, depending on your instance configuration.
 
-### `.value()`
+## `.findItem(data)`
 
-Returns the input value as a delimited list of tags. This is the recommended format in which you should send values to the server, because of progressive enhancement.
+Finds an item by its `data` string or object.
 
-### `.convert(everything=false)`
+## `.findItemIndex(data)`
 
-Parses text to the left of the caret into tags. If `everything` was true, it'll parse everything into tags instead. Useful for binding your own event handlers and deciding when to convert text into tags.
+Return the index of the first item found by its `data` string or object.
 
-### `.destroy()`
+## `.findItemByElement(el)`
 
-Removes all event listeners, CSS classes, and DOM elements created by Insignia. The input's `value` is set to the output of `.values()`. Once the instance is destroyed it becomes useless, and you'll have to call `insignia(input, options)` once again if you want to restore the behavior.
+Finds an item by its `.nsg-tag` DOM element.
 
-# Events
+## `.removeItem(data)`
 
-Once you've instantiated a `insignia`, some propietary synthetic events will be emitted on the provided `input`.
+Removes an item from the input. The item is found using the `data` string or object.
 
-Name                 | Description
----------------------|---------------------------------------------------------------------------------
-`insignia-converted` | Fired after a tag has been converted
-`insignia-evaluated` | Fired after a tag has been converted or the input moved to edit another tag
+## `.removeItemByElement(el)`
+
+Removes an item from the input. The item is found using a `.nsg-tag` DOM element.
+
+## `.value()`
+
+Returns the list of valid tags as an array.
+
+## `.allValues()`
+
+Returns the list of tags as an array including invalid tags.
+
+## `.destroy()`
+
+Removes all event listeners, CSS classes, and DOM elements created by insignia. The input's `value` is set to the output of `.value()`. Once the instance is destroyed it becomes useless, and you'll have to call `insignia(input, options)` once again if you want to restore the behavior.
+
+## Instance Events
+
+The instance API comes with a few events.
+
+Event     | Arguments    | Description
+----------|--------------|------------
+`add`     | `data`, `el` | Emitted whenever a new item is added to the list
+`remove`  | `data`       | Emitted whenever an item is removed from the list
+`invalid` | `data`, `el` | Emitted whenever an invalid item is added to the list
+
+You can listen to these events using the following API.
+
+```js
+const toy = insignia(el);
+toy.on('add', data => console.log(data)); // listen to an event
+toy.once('invalid', data => throw new Error('invalid data')); // listener discarded after one execution
+
+toy.on('add', added);
+toy.off('add', added); // removes `added` listener
+
+function added (data) {
+  console.log(data);
+}
+```
 
 # License
 

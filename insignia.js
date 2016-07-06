@@ -1,142 +1,294 @@
 'use strict';
 
-require('./polyfills/String.prototype.trim');
-require('./polyfills/Array.prototype.indexOf');
+import sell from 'sell';
+import crossvent from 'crossvent';
+import emitter from 'contra/emitter';
+import dom from './dom';
+import text from './text';
+import autosize from './autosize';
+const inputTag = /^input$/i;
+const ELEMENT = 1;
+const BACKSPACE = 8;
+const END = 35;
+const HOME = 36;
+const LEFT = 37;
+const RIGHT = 39;
+const sinkableKeys = [END, HOME];
+const tagClass = /\bnsg-tag\b/;
+const tagRemovalClass = /\bnsg-tag-remove\b/;
+const editorClass = /\bnsg-editor\b/g;
+const inputClass = /\bnsg-input\b/g;
+const end = { start: 'end', end: 'end' };
+const defaultDelimiter = ' ';
 
-var crossvent = require('crossvent');
-var dom = require('./dom');
-var text = require('./text');
-var slice = require('./slice');
-var autosize = require('./autosize');
-var selection = require('./selection');
-var inputTag = /^input$/i;
-var ELEMENT = 1;
-var BACKSPACE = 8;
-var END = 35;
-var HOME = 36;
-var LEFT = 37;
-var RIGHT = 39;
-var tagClass = /\bnsg-tag\b/;
-var tagRemovalClass = /\bnsg-tag-remove\b/;
-var editorClass = /\bnsg-editor\b/g;
-var inputClass = /\bnsg-input\b/g;
-var end = { start: 'end', end: 'end' };
-var cache = [];
-var defaultDelimiter = ' ';
-
-function find (el) {
-  var entry;
-  var i;
-  for (i = 0; i < cache.length; i++) {
-    entry = cache[i];
-    if (entry.el === el) {
-      return entry.api;
-    }
-  }
-  return null;
-}
-
-function insignia (el, options) {
-  var cached = find(el);
-  if (cached) {
-    return cached;
-  }
-
-  var _noselect = document.activeElement !== el;
-  var o = options || {};
-  var delimiter = o.delimiter || defaultDelimiter;
+function insignia (el, options = {}) {
+  const currentValues = [];
+  const o = options;
+  const delimiter = o.delimiter || defaultDelimiter;
   if (delimiter.length !== 1) {
-    throw new Error('Insignia expected a single-character delimiter string');
+    throw new Error('insignia expected a single-character delimiter string');
   }
-  var any = hasSiblings(el);
+  const any = hasSiblings(el);
   if (any || !inputTag.test(el.tagName)) {
-    throw new Error('Insignia expected an input element without any siblings');
+    throw new Error('insignia expected an input element without any siblings');
   }
-  var parse = o.parse || defaultParse;
-  var validate = o.validate || defaultValidate;
-  var render = o.render || defaultRenderer;
-  var readTag = o.readTag || defaultReader;
-	var convertOnFocus = o.convertOnFocus !== false;
+  const free = o.free !== false;
+  const validate = o.validate || defaultValidate;
+  const render = o.render || defaultRenderer;
+  const convertOnBlur = o.convertOnBlur !== false;
 
-  var before = dom('span', 'nsg-tags nsg-tags-before');
-  var after = dom('span', 'nsg-tags nsg-tags-after');
-  var parent = el.parentElement;
+  const toItemData = defaultToItemData;
+
+  const userGetText = o.getText;
+  const userGetValue = o.getValue;
+  const getText = (
+    typeof userGetText === 'string' ? d => d[userGetText] :
+    typeof userGetText === 'function' ? userGetText :
+    d => d.toString()
+  );
+  const getValue = (
+    typeof userGetValue === 'string' ? d => d[userGetValue] :
+    typeof userGetValue === 'function' ? userGetValue :
+    d => d
+  );
+
+  const before = dom('span', 'nsg-tags nsg-tags-before');
+  const after = dom('span', 'nsg-tags nsg-tags-after');
+  const parent = el.parentElement;
+  let blurblock = tick();
+
   el.className += ' nsg-input';
   parent.className += ' nsg-editor';
   parent.insertBefore(before, el);
   parent.insertBefore(after, el.nextSibling);
+
+  const shrinker = autosize(el);
+  const api = emitter({
+    addItem,
+    findItem: data => findItem(data),
+    findItemIndex: data => findItemIndex(data),
+    findItemByElement: el => findItem(el, 'el'),
+    removeItem: removeItemByData,
+    removeItemByElement,
+    value: readValue,
+    allValues: readValueAll,
+    refresh: convert,
+    destroy
+  });
+
+  const placeholder = el.getAttribute('placeholder');
+  let placeheld = true;
+
   bind();
 
-  var auto = autosize(el);
-  var api = {
-    tags: readTags,
-    value: readValue,
-    convert: convert,
-    destroy: destroy
-  };
-  var entry = { el: el, api: api };
-
-  evaluate([delimiter], true);
-  cache.push(entry);
-  _noselect = false;
+  (document.activeElement === el ?
+    evaluateSelect :
+    evaluateNoSelect
+  )([delimiter], true);
 
   return api;
 
+  function findItem (value, prop='data') {
+    const comp = (prop === 'data' ?
+      item => getValue(item[prop]) === getValue(value) :
+      item => item[prop] === value
+    );
+    for (let i = 0; i < currentValues.length; i++) {
+      if (comp(currentValues[i])) {
+        return currentValues[i];
+      }
+    }
+    return null;
+  }
+
+  function findItemIndex (value, prop='data') {
+    const comp = (prop === 'data' ?
+      item => getValue(item[prop]) === getValue(value) :
+      item => item[prop] === value
+    );
+    for (let i = 0; i < currentValues.length; i++) {
+      if (comp(currentValues[i])) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  function addItem (data) {
+    const valid = validate(data);
+    const item = { data, valid };
+    if (o.preventInvalid && !valid) {
+      return api;
+    }
+    const el = renderItem(item);
+    if (!el) {
+      return api;
+    }
+    item.el = el;
+    currentValues.push(item);
+    api.emit('add', data, el);
+    invalidate();
+    return api;
+  }
+
+  function removeItem (item) {
+    if (!item) {
+      return api;
+    }
+    removeItemElement(item.el);
+    currentValues.splice(currentValues.indexOf(item), 1);
+    api.emit('remove', item.data);
+    invalidate();
+    return api;
+  }
+
+  function invalidate () {
+    currentValues.slice().forEach((v,i) => {
+      currentValues.splice(i, 1);
+
+      const valid = validate(v.data, i);
+      if (valid) {
+        v.el.classList.add('nsg-valid');
+        v.el.classList.remove('nsg-invalid');
+      } else {
+        v.el.classList.add('nsg-invalid');
+        v.el.classList.remove('nsg-valid');
+        api.emit('invalid', v.data, v.el);
+      }
+      v.valid = valid;
+
+      currentValues.splice(i, 0, v);
+    });
+  }
+
+  function removeItemByData (data) {
+    return removeItem(findItem(data));
+  }
+
+  function removeItemByElement (el) {
+    return removeItem(findItem(el, 'el'));
+  }
+
+  function renderItem (item) {
+    return createTag(before, item);
+  }
+
+  function removeItemElement (el) {
+    if (el.parentElement) {
+      el.parentElement.removeChild(el);
+    }
+  }
+
+  function createTag (buffer, item) {
+    const {data} = item;
+    const empty = typeof data === 'string' && data.trim().length === 0;
+    if (empty) {
+      return null;
+    }
+    const el = dom('span', 'nsg-tag');
+    render(el, item);
+    if (o.deletion) {
+      el.appendChild(dom('span', 'nsg-tag-remove'));
+    }
+    buffer.appendChild(el);
+    return el;
+  }
+
+  function defaultToItemData (s) {
+    return s;
+  }
+
+  function readValue () {
+    return currentValues.filter(v => v.valid).map(v => v.data);
+  }
+
+  function readValueAll () {
+    return currentValues.map(v => v.data);
+  }
+
+  function updatePlaceholder (e) {
+    const any = parent.querySelector('.nsg-tag');
+    if (!any && !placeheld) {
+      el.setAttribute('placeholder', placeholder);
+      placeheld = true;
+    } else if (any && placeheld) {
+      el.removeAttribute('placeholder');
+      placeheld = false;
+    }
+  }
+
   function bind (remove) {
-    var op = remove ? 'remove' : 'add';
+    const op = remove ? 'remove' : 'add';
+    const ev = remove ? 'off' : 'on';
     crossvent[op](el, 'keydown', keydown);
     crossvent[op](el, 'keypress', keypress);
     crossvent[op](el, 'paste', paste);
     crossvent[op](parent, 'click', click);
-		if (convertOnFocus) {
-      crossvent[op](document.documentElement, 'focus', documentfocus, true);
+    if (convertOnBlur) {
+      crossvent[op](document.documentElement, 'blur', documentblur, true);
+      crossvent[op](document.documentElement, 'mousedown', documentmousedown);
+    }
+    if (placeholder) {
+      api[ev]('add', updatePlaceholder);
+      api[ev]('remove', updatePlaceholder);
+      crossvent[op](el, 'keydown', updatePlaceholder);
+      crossvent[op](el, 'keypress', updatePlaceholder);
+      crossvent[op](el, 'paste', updatePlaceholder);
+      crossvent[op](parent, 'click', updatePlaceholder);
+      updatePlaceholder();
     }
   }
 
   function destroy () {
     bind(true);
-    el.value = readValue();
+    el.value = '';
     el.className = el.className.replace(inputClass, '');
     parent.className = parent.className.replace(editorClass, '');
-    before.parentElement.removeChild(before);
-    after.parentElement.removeChild(after);
-    cache.splice(cache.indexOf(entry), 1);
-    auto.destroy();
+    if (before.parentElement) { before.parentElement.removeChild(before); }
+    if (after.parentElement) { after.parentElement.removeChild(after); }
+    shrinker.destroy();
     api.destroyed = true;
-    api.destroy = noop(api);
-    api.tags = api.value = noop(null);
+    api.destroy = api.addItem = api.removeItem = () => api;
+    api.tags = api.value = () => null;
     return api;
   }
 
-  function noop (value) {
-    return function destroyed () {
-      return value;
-    };
+  function tick () {
+    return new Date().valueOf();
   }
 
-  function documentfocus (e) {
-    if (e.target !== el) {
-      _noselect = true;
-      convert(true);
-      _noselect = false;
+  function documentblur (e) {
+    if (blurblock > tick()) {
+      return;
+    }
+    convert(true);
+  }
+
+  function documentmousedown (e) {
+    var el = e.target;
+    while (el) {
+      if (el === parent) {
+        blurblock = tick() + 100;
+      }
+      el = el.parentElement;
     }
   }
 
   function click (e) {
-    var target = e.target;
+    const target = e.target;
     if (tagRemovalClass.test(target.className)) {
-      focusTag(target.parentElement, { start: 'end', end: 'end', remove: true });
-      shift();
+      removeItemByElement(target.parentElement);
+      el.focus();
       return;
     }
-    var top = target;
-    var tagged = tagClass.test(top.className);
-    while (tagged === false && top.parentElement) {
-      top = top.parentElement;
-      tagged = tagClass.test(top.className);
+    let parent = target;
+    let tagged = tagClass.test(parent.className);
+    while (tagged === false && parent.parentElement) {
+      parent = parent.parentElement;
+      tagged = tagClass.test(parent.className);
     }
-    if (tagged) {
-      focusTag(top, end);
+    if (tagged && free) {
+      focusTag(parent, end);
     } else if (target !== el) {
       shift();
       el.focus();
@@ -145,15 +297,14 @@ function insignia (el, options) {
 
   function shift () {
     focusTag(after.lastChild, end);
-    evaluate([delimiter], true);
+    evaluateSelect([delimiter], true);
   }
 
   function convert (all) {
-    evaluate([delimiter], all);
+    (all ? evaluateNoSelect : evaluateSelect)([delimiter], all);
     if (all) {
       each(after, moveLeft);
     }
-    crossvent.fabricate(el, 'insignia-converted');
     return api;
   }
 
@@ -162,28 +313,42 @@ function insignia (el, options) {
   }
 
   function keydown (e) {
-    var sel = selection(el);
-    var key = e.which || e.keyCode || e.charCode;
-    if (key === HOME) {
-      if (before.firstChild) {
-        focusTag(before.firstChild, {});
+    const sel = sell(el);
+    const key = e.which || e.keyCode || e.charCode;
+    const canMoveLeft = sel.start === 0 && sel.end === 0 && before.lastChild;
+    const canMoveRight = sel.start === el.value.length && sel.end === el.value.length && after.firstChild;
+    if (free) {
+      if (key === HOME) {
+        if (before.firstChild) {
+          focusTag(before.firstChild, {});
+        } else {
+          sell(el, { start: 0, end: 0 });
+        }
+      } else if (key === END) {
+        if (after.lastChild) {
+          focusTag(after.lastChild, end);
+        } else {
+          sell(el, end);
+        }
+      } else if (key === BACKSPACE && canMoveLeft) {
+        removeItemByElement(before.lastChild);
+      } else if (key === RIGHT && canMoveRight) {
+        focusTag(after.firstChild, {});
+      } else if (key === LEFT && canMoveLeft) {
+        focusTag(before.lastChild, end);
       } else {
-        selection(el, { start: 0, end: 0 });
+        return;
       }
-    } else if (key === END) {
-      if (after.lastChild) {
-        focusTag(after.lastChild, end);
-      } else {
-        selection(el, end);
-      }
-    } else if (key === LEFT && sel.start === 0 && before.lastChild) {
-      focusTag(before.lastChild, end);
-    } else if (key === BACKSPACE && sel.start === 0 && (sel.end === 0 || sel.end !== el.value.length) && before.lastChild) {
-      focusTag(before.lastChild, end);
-    } else if (key === RIGHT && sel.end === el.value.length && after.firstChild) {
-      focusTag(after.firstChild, {});
     } else {
-      return;
+      if (key === BACKSPACE && canMoveLeft) {
+        removeItemByElement(before.lastChild);
+      } else if (key === RIGHT && canMoveRight) {
+        before.appendChild(after.firstChild);
+      } else if (key === LEFT && canMoveLeft) {
+        after.insertBefore(before.lastChild, after.firstChild);
+      } else if (sinkableKeys.indexOf(key) === -1) { // prevent default otherwise
+        return;
+      }
     }
 
     e.preventDefault();
@@ -191,7 +356,7 @@ function insignia (el, options) {
   }
 
   function keypress (e) {
-    var key = e.which || e.keyCode || e.charCode;
+    const key = e.which || e.keyCode || e.charCode;
     if (String.fromCharCode(key) === delimiter) {
       convert();
       e.preventDefault();
@@ -200,75 +365,55 @@ function insignia (el, options) {
   }
 
   function paste () {
-    setTimeout(function later () { evaluate(); }, 0);
+    setTimeout(() => evaluateSelect(), 0);
   }
 
-  function evaluate (extras, entirely) {
-    var p = selection(el);
-    var len = entirely ? Infinity : p.start;
-    var tags = el.value.slice(0, len).concat(extras || []).split(delimiter);
-    if (tags.length < 1) {
+  function evaluateNoSelect (extras, entirely) {
+    evaluateInternal(extras, entirely); // necessary for blur events, initialization, unfocused evaluation
+  }
+
+  function evaluateSelect (extras, entirely) {
+    evaluateInternal(extras, entirely, sell(el)); // only if we know the input has/should have focus
+  }
+
+  function evaluateInternal (extras, entirely, p) {
+    const len = entirely || !p ? Infinity : p.start;
+    const tags = el.value.slice(0, len).concat(extras || []).split(delimiter);
+    if (tags.length < 1 || !free) {
       return;
     }
 
-    var rest = tags.pop() + el.value.slice(len);
-    var removal = tags.join(delimiter).length;
-    var i;
+    const rest = tags.pop() + el.value.slice(len);
+    const removal = tags.join(delimiter).length;
 
-    for (i = 0; i < tags.length; i++) {
-      createTag(before, tags[i]);
-    }
-    cleanup();
+    tags.forEach(tag => addItem(toItemData(tag)));
     el.value = rest;
-    p.start -= removal;
-    p.end -= removal;
-    if (_noselect !== true) { selection(el, p); }
-    auto.refresh();
-    crossvent.fabricate(el, 'insignia-evaluated');
-  }
+    reselect();
+    shrinker.refresh();
 
-  function cleanup () {
-    var tags = [];
-
-    each(before, detect);
-    each(after, detect);
-
-    function detect (value, tagElement) {
-      if (validate(value, slice(tags))) {
-        tags.push(value);
-      } else {
-        tagElement.parentElement.removeChild(tagElement);
+    function reselect () {
+      if (p) {
+        p.start -= removal;
+        p.end -= removal;
+        sell(el, p);
       }
     }
   }
 
-  function defaultRenderer (container, value) {
-    text(container, value);
+  function defaultRenderer (container, item) {
+    text(container, getText(item.data));
   }
 
-  function defaultReader (tag) {
+  function readTag (tag) {
     return text(tag);
-  }
-
-  function createTag (buffer, value) {
-    var trimmed = value.trim();
-    if (trimmed.length === 0) {
-      return;
-    }
-    var el = dom('span', 'nsg-tag');
-    render(el, parse(trimmed));
-    if (o.deletion) {
-      el.appendChild(dom('span', 'nsg-tag-remove'));
-    }
-    buffer.appendChild(el);
   }
 
   function focusTag (tag, p) {
     if (!tag) {
       return;
     }
-    evaluate([delimiter], true);
-    var parent = tag.parentElement;
+    evaluateSelect([delimiter], true);
+    const parent = tag.parentElement;
     if (parent === before) {
       while (parent.lastChild !== tag) {
         after.insertBefore(parent.lastChild, after.firstChild);
@@ -278,72 +423,27 @@ function insignia (el, options) {
         before.appendChild(parent.firstChild);
       }
     }
-    tag.parentElement.removeChild(tag);
-    el.value = p.remove ? '' : readTag(tag);
+    const value = p.remove ? '' : readTag(tag);
+    removeItemByElement(tag);
+    el.value = value;
     el.focus();
-    selection(el, p);
-    auto.refresh();
+    sell(el, p);
+    shrinker.refresh();
   }
 
   function hasSiblings () {
-    var all = el.parentElement.children;
-    var i;
-    for (i = 0; i < all.length; i++) {
-      if (all[i] !== el && all[i].nodeType === ELEMENT) {
-        return true;
-      }
-    }
-    return false;
+    const children = el.parentElement.children;
+    return [...children].some(s => s !== el && s.nodeType === ELEMENT);
   }
 
-  function each (side, fn) {
-    var children = slice(side.children);
-    var i;
-    var tag;
-    for (i = 0; i < children.length; i++) {
-      tag = children[i];
-      fn(readTag(tag), tag, i);
-    }
+  function each (container, fn) {
+    [...container.children].forEach((tag, i) => fn(readTag(tag), tag, i));
   }
 
-  function readTags () {
-    var all = [];
-    var values = el.value.split(delimiter);
-    var i;
-
-    each(before, add);
-
-    for (i = 0; i < values.length; i++) {
-      add(values[i]);
-    }
-
-    each(after, add);
-
-    return all;
-
-    function add (value) {
-      if (!value) {
-        return;
-      }
-      var tag = parse(value);
-      if (validate(tag, slice(all))) {
-        all.push(tag);
-      }
-    }
-  }
-
-  function readValue () {
-    return readTags().join(delimiter);
-  }
-
-  function defaultParse (value) {
-    return value.trim().toLowerCase();
-  }
-
-  function defaultValidate (value, tags) {
-    return tags.indexOf(value) === -1;
+  function defaultValidate (value, i) {
+    const x = findItemIndex(value);
+    return x === i || x === null ;
   }
 }
 
-insignia.find = find;
 module.exports = insignia;

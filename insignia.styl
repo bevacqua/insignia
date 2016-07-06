@@ -1,6 +1,6 @@
  @import 'node_modules/nib/index'
 
- .nsg-editor
+.nsg-editor
   padding 10px
   cursor text
 
@@ -10,6 +10,9 @@
   padding 3px
   margin 4px
 
+.nsg-invalid
+  border-color #c00
+
 .nsg-tag-remove:after
   margin-left 4px
   padding 0 4px
@@ -18,6 +21,9 @@
   cursor pointer
 
 .nsg-input
-  transition width 0.25s
-  padding 3px
+  display inline-block
+  padding 3px 3px 3px 8px
   margin 5px 0
+
+  &[placeholder]
+    min-width 100%

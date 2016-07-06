@@ -1,3 +1,7 @@
+# 5.0.0 Vampire
+
+- Completely revamped, see API documentation
+
 # 4.4.0 FocusFest
 
 - Added `convertOnFocus` option
