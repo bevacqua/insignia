@@ -91,13 +91,13 @@ Note that `tags` is only a copy and modifying it won't affect the list of tags.
 
 A method that's called whenever a tag should be rendered. Defaults to setting `getText(item)` as the container's text.
 
-## `parseText`
+## `getText`
 
-When you have complex data items from autocomplete, you need to set `parseText` to read the value that should be used as a display value.
+When you have complex data items from autocomplete, you need to set `getText` to read the value that should be used as a display value.
 
-## `parseValue`
+## `getValue`
 
-When you have complex data items from autocomplete, you need to set `parseText` to read the value that should be used as each tag's value.
+When you have complex data items from autocomplete, you need to set `getValue` to read the value that should be used as each tag's value.
 
 ## `convertOnBlur`
 
@@ -138,6 +138,10 @@ Returns the list of valid tags as an array.
 ## `.allValues()`
 
 Returns the list of tags as an array including invalid tags.
+
+## `.refresh()`
+
+When changing the value of the `el` input by hand, call `.refresh()` to convert tags again.
 
 ## `.destroy()`
 
