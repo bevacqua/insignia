@@ -64,7 +64,7 @@ insignia(input);
     <pre>
       <code>
 insignia(input, {
-  parse: function (value) {
+  getText: function (value) {
     return value.toUpperCase();
   }
 });
@@ -94,7 +94,7 @@ insignia(input, {
     <pre>
       <code>
 insignia(input, {
-  parse: function (value) {
+  getText: function (value) {
     return value.toUpperCase();
   },
   validate: function (value, tags) {
@@ -149,7 +149,7 @@ var tagInput = insignia(input);
 
 input.addEventListener('keypress', function (e) {
   if (e.keyCode === 13) {
-    tagInput.convert();
+    tagInput.refresh();
     e.preventDefault(); // prevent form submission
   }
 });

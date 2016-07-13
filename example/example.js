@@ -9,7 +9,7 @@ void function () {
   insignia(def);
   insignia(lng);
   insignia(prs, {
-    parse: function (value) {
+    getText: function (value) {
       return value.toUpperCase();
     }
   })
@@ -19,7 +19,7 @@ void function () {
     }
   });
   insignia(bth, {
-    parse: function (value) {
+    getText: function (value) {
       return value.toUpperCase();
     },
     validate: function () {
@@ -45,7 +45,7 @@ void function () {
 
   function antenter (e) {
     if (e.keyCode === 13) {
-      anti.convert();
+      anti.refresh();
       e.preventDefault();
     }
   }

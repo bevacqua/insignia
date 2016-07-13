@@ -92,10 +92,6 @@ button:hover {
   color: #ecf0f1;
 }
 
-.nsg-tag {
-  border-color: #16a085;
-}
-
 .inline {
   display: inline-block;
 }
@@ -105,4 +101,12 @@ button:hover {
   top: 0;
   right: 0;
   border: 0;
+}
+
+.nsg-tag {
+  border-color: #16a085;
+}
+
+.nsg-invalid {
+  border-color: #c00;
 }
